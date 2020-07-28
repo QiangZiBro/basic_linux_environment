@@ -15,6 +15,7 @@ RUN export uid=1000 gid=1000 pswd=password &&\
     apt-get clean && \
     groupadd -g $gid $USER && \
     useradd -g $USER -G sudo -m -s /bin/bash $USER && \
+    # -m : create home dir if not exists
     echo "$USER:$pswd" | chpasswd && \
     mkdir -p /home/$USER && \
     mkdir -p /etc/sudoers.d && \
@@ -25,7 +26,7 @@ RUN export uid=1000 gid=1000 pswd=password &&\
 
 
 #------------------------------------------------------------------------------
-# Change to china source and fix ssl bug
+# Change to china source, install privoxy and shadowsocks and fix ssl bug
 #------------------------------------------------------------------------------
 COPY .pip /root/.pip
 RUN python3 -m pip install shadowsocks &&\
@@ -45,6 +46,7 @@ ENV SERVER_ADDR= \
 
 
 ADD rootfs /home/$USER/rootfs
+USER $USER
 
 #------------------------------------------------------------------------------
 # Expose ports, so you can use the exposed port when build:
