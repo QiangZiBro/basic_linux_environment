@@ -1,5 +1,36 @@
 #!/bin/bash
 
+MY_COMMAND='
+<===================================
+spd () {
+	if [ "$1" = "start" ]
+	then
+		export http_proxy="127.0.0.1:8118"
+		export https_proxy="127.0.0.1:8118"
+		echo http_proxy=$http_proxy
+		echo https_proxy=$https_proxy
+		git config --global https.proxy https://127.0.0.1:8118
+	else
+		if [ "$1" = "stop" ]
+		then
+			export http_proxy=""
+			export https_proxy=""
+			echo http_proxy=$http_proxy
+			echo https_proxy=$https_proxy
+		else
+			echo "Wrong parameter!Usage: spd [start|stop]"
+		fi
+	fi
+}
+===================================>
+'
+
+if grep -q "$MY_COMMAND" ~/.zshrc
+then
+    # not found
+    echo $MY_COMMAND >> ~/.zshrc
+fi
+
 # config
 if test "$(uname)" = "Darwin"
 then
