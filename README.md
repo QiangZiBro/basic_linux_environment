@@ -8,27 +8,37 @@ Forked from [bluebu/shadowsocks-privoxy](bluebu/shadowsocks-privoxy) . Specified
 
 ## Pre-config and Docker building
 ```bash
+# build docker image
 ./bootstrap.sh
 ```
 
+You should add ss config file in [./rootfs/etc/ss/](./rootfs/etc/ss/) :
+
+```json
+# ss.json
+{
+  ...
+}
+```
+
+
+
 ## Usage
 
-**Start the container**
-
 ```bash
-./bin/spd_service [start|stop]
+https://github.com/QiangZiBro/basic_linux_environment.git
+cd basic_linux_environment
+
+# start
+./bin/spd_service start
+
+# exec into doceker after start
+./bin/spd_service exec
+
+# stop
+./bin/spd_service stop
 ```
 
-You should modify ss config in [./bin/spd_service](./bin/spd_service) by:
-
-```
-docker run -d  -p <your_local_port>:8118 \
-  -e SERVER_ADDR=your_ss_server_ip\
-  -e SERVER_PORT=your_ss_server_port\
-  -e PASSWORD=your_pass_word\
-  -e METHOD=your_method\
-  ss:v1
-```
 
 
 **Command proxy in local machine:**
