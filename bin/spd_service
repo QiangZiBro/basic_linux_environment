@@ -6,14 +6,17 @@ set -e
 cd "$(dirname $0)"/..
 LOCAL_PORT=8118
 CONTAINER_NAME=shadowsocks_privoxy_docker
-SERVER_IP=`head -1 config/account.txt`
 
 start_container(){
+    # echo Reopen a new container
+    docker run -d -v `realpath ./rootfs/etc/ss/ss.json`:/home/qiangzibro/rootfs/etc/ss/ss.json -p $LOCAL_PORT:8118 --name $CONTAINER_NAME ss:v1
+}
+
+reload_container(){
     # echo This script may need sudo priviledge
     stop_container_if_exists
+    start_container
     
-    # echo Reopen a new container
-    docker run -d -e SERVER_ADDR=$SERVER_IP -p $LOCAL_PORT:8118 --name $CONTAINER_NAME ss:v1
 }
 
 stop_container_if_exists(){
@@ -27,10 +30,21 @@ stop_container_if_exists(){
         docker rm $CONTAINER_NAME
     fi
 }
+start_container_if_not_exists(){
+    if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
+        if [ "$(docker ps -aq -f status=exited -f name=$CONTAINER_NAME)" ]; then
+            # echo Original container is not running
+            docker start $CONTAINER_NAME
+        fi
+        # echo Original container has stopped, remove original container
+    else
+        start_container
+    fi
+}
 
 # useless if this file is not sourced
-if [ "$1" = "start" ];then
-    start_container
+if [ "$1" = "reload" ];then
+    reload_container
     export http_proxy=127.0.0.1:$LOCAL_PORT
     export https_proxy=127.0.0.1:$LOCAL_PORT
     echo '
@@ -53,6 +67,9 @@ elif [ "$1" = "stop" ];then
 elif [ "$1" = "exec" ];then
     docker exec -it shadowsocks_privoxy_docker /bin/bash
 
+elif [ "$1" = "start" ];then
+    start_container_if_not_exists
+
 else
-    echo "Wrong parameter!Usage: proxy [start|stop]"
+    echo "Wrong parameter! Parameters: [start|stop|exec]"
 fi
