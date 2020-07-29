@@ -9,7 +9,7 @@ CONTAINER_NAME=shadowsocks_privoxy_docker
 
 start_container(){
     # echo Reopen a new container
-    docker run -d -v `realpath ./rootfs/etc/ss/ss.json`:/home/qiangzibro/rootfs/etc/ss/ss.json -p $LOCAL_PORT:8118 --name $CONTAINER_NAME ss:v1
+    docker run -d -v `realpath ./rootfs/etc/ss/ss.json`:/home/qiangzibro/rootfs/etc/ss/ss.json -p $LOCAL_PORT:8118 --name $CONTAINER_NAME ss:common
 }
 
 reload_container(){

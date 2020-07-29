@@ -25,4 +25,4 @@ then
 	
 fi
 
-docker build -t ss:v1 .
+docker build -t ss:common .
