@@ -48,6 +48,7 @@ RUN apt-get install -y --no-install-recommends \
         curl git procps tmux zsh
 #    rm -rf /var/lib/apt/lists/*
 
+#Config file
 WORKDIR /home/$USER/rootfs
 ADD rootfs /home/$USER/rootfs
 COPY ./Qdotfiles /home/$USER/.Qdotfiles
@@ -71,5 +72,21 @@ RUN sudo -p password apt install --no-install-recommends -y neovim &&\
 
     sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+RUN ./entrypoint.sh daemon &&\
+    sleep 2 &&\
+    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
+    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim' 
+
+RUN ./entrypoint.sh daemon &&\
+    sleep 2 &&\
+    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
+
+    cd ~/.Qdotfiles && ./scripts/bootstrap.sh &&\
+    nvim +PlugInstall +qall
+
+ENV spd="/home/$USER/rootfs/entrypoint.sh daemon && sleep 2 && export https_proxy=127.0.0.1:8118 && export http_proxy=127.0.0.1:8118"
+RUN $spd && curl google.com
 ENTRYPOINT [ "/usr/bin/zsh" ]
 #CMD ["./entrypoint.sh"]
