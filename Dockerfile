@@ -45,23 +45,12 @@ EXPOSE 8118
 #  Install softwares, below are things that maybe frequently modified
 #------------------------------------------------------------------------------
 RUN apt-get install -y --no-install-recommends \
-        curl git procps                       
+        curl git procps tmux zsh
 #    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/$USER/rootfs
 ADD rootfs /home/$USER/rootfs
 COPY ./Qdotfiles /home/$USER/.Qdotfiles
-
-# Example 1: Use command proxy either in container or docker file,
-# remember to sleep for a while, because the configuration can't start that fast
-RUN apt-get -y install zsh &&\
-    # Start proxy
-    echo "Testing for command in docker:\n" &&\
-    ./entrypoint.sh daemon &&\
-    sleep 2 &&\
-    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
-    # Your command that need proxy
-    curl google.com
 
 USER $USER
 
@@ -72,8 +61,15 @@ RUN ./entrypoint.sh daemon &&\
     # Your command that need proxy
     wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -qO - | zsh && \
     cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
-    echo 'export LANG=en_US.utf8' >> ~/.zshrc
+    echo 'export LANG=en_US.utf8' >> ~/.zshrc && sudo -p password chsh $USER -s $(which zsh) 
 
-RUN sudo -p password chsh $USER -s $(which zsh) 
+# install neovim 
+RUN sudo -p password apt install --no-install-recommends -y neovim &&\
+    ./entrypoint.sh daemon &&\
+    sleep 2 &&\
+    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
+
+    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 ENTRYPOINT [ "/usr/bin/zsh" ]
 #CMD ["./entrypoint.sh"]
