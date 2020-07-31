@@ -3,15 +3,19 @@
 #------------------------------------------------------------------------------
 FROM continuumio/miniconda3
 
+ENV USER=qiangzibro
 
 #------------------------------------------------------------------------------
 # Linux Environment
 #------------------------------------------------------------------------------
+# 1.change source
 COPY ./rootfs/etc/apt/sources.list /etc/apt/sources.list
-RUN apt-get update --fix-missing -qqy && apt-get update  -qqy
-ENV USER=qiangzibro
+RUN apt-get update --fix-missing -qqy && apt-get update  -qqy &&\
+    apt-get install -y --no-install-recommends \
+        # some basic softwares 
+        sudo privoxy curl git procps 
+# 2.create user
 RUN export uid=1000 gid=1000 pswd=password &&\
-    apt-get install -y --no-install-recommends sudo privoxy && \
     apt-get clean && \
     groupadd -g $gid $USER && \
     useradd -g $USER -G sudo -m -s /bin/bash $USER && \
@@ -22,12 +26,11 @@ RUN export uid=1000 gid=1000 pswd=password &&\
     echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER && \
     chmod 0440 /etc/sudoers.d/$USER && \
     chown ${uid}:${gid} -R /home/$USER 
-    
-
 
 #------------------------------------------------------------------------------
-# Change to china source, install privoxy and shadowsocks and fix ssl bug
+# Python Environment
 #------------------------------------------------------------------------------
+#Change to china source, install privoxy and shadowsocks and fix ssl bug
 COPY .pip /root/.pip
 RUN python3 -m pip install shadowsocks &&\
     sed -i "s|cleanup|reset|g"  /opt/conda/lib/python3.7/site-packages/shadowsocks/crypto/openssl.py
@@ -44,48 +47,22 @@ EXPOSE 8118
 #------------------------------------------------------------------------------
 #  Install softwares, below are things that maybe frequently modified
 #------------------------------------------------------------------------------
+RUN apt-get update  -qqy
 RUN apt-get install -y --no-install-recommends \
-        curl git procps tmux zsh
+        tmux zsh
 #    rm -rf /var/lib/apt/lists/*
 
-#Config file
 WORKDIR /home/$USER/rootfs
-ADD rootfs /home/$USER/rootfs
+COPY rootfs /home/$USER/rootfs
 COPY ./Qdotfiles /home/$USER/.Qdotfiles
-
 USER $USER
 
-RUN cd ~/.Qdotfiles && ./scripts/bootstrap.sh
+RUN cd ~/.Qdotfiles && ./scripts/bootstrap.sh config
 
-RUN sudo -p password apt update && ./entrypoint.sh daemon &&\
+RUN ./entrypoint.sh daemon &&\
     sleep 2 &&\
     export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
     # Your command that need proxy
     sudo -p password su && bash ~/.Qdotfiles/scripts/install_softwares.sh
 
-RUN cd ~/.Qdotfiles && ./scripts/bootstrap.sh config
-# install neovim 
-#RUN ./entrypoint.sh daemon &&\
-#    sleep 2 &&\
-#    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
-#    bash ~/.Qdotfiles/neovim/install.sh
-
-#    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-#       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-#
-#
-#RUN ./entrypoint.sh daemon &&\
-#    sleep 2 &&\
-#    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
-#
-#    cd ~/.Qdotfiles && ./scripts/bootstrap.sh &&\
-#    #use +qall so install process will not stop
-#    nvim +PlugInstall +qall
-
-# install z
-#RUN ./entrypoint.sh daemon &&\
-#    sleep 2 &&\
-#    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
-#
-#    sudo -p password su && bash ~/.Qdotfiles/zlua/install.sh
 CMD ["./entrypoint.sh"]
