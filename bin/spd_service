@@ -38,6 +38,7 @@ start_container_if_not_exists(){
         fi
         # echo Original container has stopped, remove original container
     else
+        echo start
         start_container
     fi
 }
@@ -65,7 +66,11 @@ elif [ "$1" = "stop" ];then
     export https_proxy=""
 
 elif [ "$1" = "exec" ];then
-    docker exec -it shadowsocks_privoxy_docker /bin/bash
+    if [ "$2" = "zsh" ];then
+        docker exec -it shadowsocks_privoxy_docker /usr/bin/zsh
+    else
+        docker exec -it shadowsocks_privoxy_docker /bin/bash
+    fi
 
 elif [ "$1" = "start" ];then
     start_container_if_not_exists

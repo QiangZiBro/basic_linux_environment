@@ -55,38 +55,37 @@ COPY ./Qdotfiles /home/$USER/.Qdotfiles
 
 USER $USER
 
-# install ohmyzsh
-RUN ./entrypoint.sh daemon &&\
+RUN cd ~/.Qdotfiles && ./scripts/bootstrap.sh
+
+RUN sudo -p password apt update && ./entrypoint.sh daemon &&\
     sleep 2 &&\
     export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
     # Your command that need proxy
-    wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -qO - | zsh && \
-    cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
-    echo 'export LANG=en_US.utf8' >> ~/.zshrc && sudo -p password chsh $USER -s $(which zsh) 
+    sudo -p password su && bash ~/.Qdotfiles/scripts/install_softwares.sh
 
+RUN cd ~/.Qdotfiles && ./scripts/bootstrap.sh config
 # install neovim 
-RUN sudo -p password apt install --no-install-recommends -y neovim &&\
-    ./entrypoint.sh daemon &&\
-    sleep 2 &&\
-    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
+#RUN ./entrypoint.sh daemon &&\
+#    sleep 2 &&\
+#    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
+#    bash ~/.Qdotfiles/neovim/install.sh
 
-    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+#    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+#       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+#
+#
+#RUN ./entrypoint.sh daemon &&\
+#    sleep 2 &&\
+#    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
+#
+#    cd ~/.Qdotfiles && ./scripts/bootstrap.sh &&\
+#    #use +qall so install process will not stop
+#    nvim +PlugInstall +qall
 
-RUN ./entrypoint.sh daemon &&\
-    sleep 2 &&\
-    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
-    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim' 
-
-RUN ./entrypoint.sh daemon &&\
-    sleep 2 &&\
-    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
-
-    cd ~/.Qdotfiles && ./scripts/bootstrap.sh &&\
-    nvim +PlugInstall +qall
-
-ENV spd="/home/$USER/rootfs/entrypoint.sh daemon && sleep 2 && export https_proxy=127.0.0.1:8118 && export http_proxy=127.0.0.1:8118"
-RUN $spd && curl google.com
-ENTRYPOINT [ "/usr/bin/zsh" ]
-#CMD ["./entrypoint.sh"]
+# install z
+#RUN ./entrypoint.sh daemon &&\
+#    sleep 2 &&\
+#    export https_proxy="127.0.0.1:8118" && export http_proxy="127.0.0.1:8118" &&\
+#
+#    sudo -p password su && bash ~/.Qdotfiles/zlua/install.sh
+CMD ["./entrypoint.sh"]
