@@ -40,5 +40,5 @@ elif [ "$1" = "exec" ]; then
     ./bin/spd_service exec zsh
 elif [ "$1" = "reexec" ]; then
     ./bin/spd_service stop
-    ./bootstrap.sh exec
+    ./bootstrap.sh exec zsh
 fi
