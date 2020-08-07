@@ -15,7 +15,7 @@ start_container(){
     export https_proxy=127.0.0.1:$LOCAL_PORT
     echo '
 --------------------------------------------------------------------------------
-  HINT: You have succeeded starting docker container, try
+  HINT: You have succeeded starting a docker container, try
 
 # Setting in local machine 
 export https_proxy="127.0.0.1:8118" \
