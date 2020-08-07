@@ -57,7 +57,7 @@ COPY rootfs /home/$USER/rootfs
 COPY ./Qdotfiles /home/$USER/.Qdotfiles
 USER $USER
 
-RUN cd ~/.Qdotfiles && ./scripts/bootstrap.sh config
+RUN cd ~/.Qdotfiles && sudo -p password su && ./scripts/bootstrap.sh
 
 RUN ./entrypoint.sh daemon &&\
     sleep 2 &&\
