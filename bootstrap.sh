@@ -33,10 +33,12 @@ elif [ "$1" = "clean" ]; then
 elif [ "$1" = "update" ]; then
     root=`pwd`
     cd ~/.Qdotfiles/
+    git pull origin master
     git add -A && git commit -m 'update'
     git push origin HEAD
 
     cd "$root"
+    git pull origin master
     git submodule foreach --recursive git pull origin master
     git add -A && git commit -m 'update '
     git push origin HEAD
