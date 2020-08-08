@@ -29,4 +29,15 @@ elif [ "$1" = "clean" ]; then
     docker stop $(docker ps -a | grep "Exited" | awk '{print $1 }') #停止容器
     docker rm $(docker ps -a | grep "Exited" | awk '{print $1 }') #删除容器
     docker rmi $(docker images | grep "none" | awk '{print $3}') #删除镜像
+
+elif [ "$1" = "update" ]; then
+    root=`pwd`
+    cd ~/.Qdotfiles/
+    git add -A && git commit -m 'update'
+    git push origin HEAD
+
+    cd "$root"
+    git submodule foreach --recursive git pull origin master
+    git add -A && git commit -m 'update on dotfiles changing'
+    git push origin HEAD
 fi
