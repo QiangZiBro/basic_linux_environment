@@ -38,6 +38,7 @@ elif [ "$1" = "update" ]; then
 
     cd "$root"
     git submodule foreach --recursive git pull origin master
-    git add -A && git commit -m 'update on dotfiles changing'
+    git add -A && git commit -m 'update '
     git push origin HEAD
+    ssh l2 "/bin/bash /home/qiangzibro/myscripts/update_environments.sh"
 fi
