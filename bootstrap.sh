@@ -4,8 +4,6 @@
 #--------------------------------------------------
 
 if [ "$1" = "build" ]; then
-    docker build -t ss:common .
-elif [ "$1" = "rebuild" ];then
     ./bin/spd_service stop 
     docker build -t ss:common .
 
