@@ -38,7 +38,7 @@ elif [ "$1" = "update" ]; then
     git push origin HEAD
 
     cd "$root"
-    git pull origin master
+    git pull origin HEAD
     git submodule foreach --recursive git pull origin master
     git add -A && git commit -m 'update '
     git push origin HEAD
