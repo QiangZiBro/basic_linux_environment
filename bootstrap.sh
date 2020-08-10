@@ -36,9 +36,9 @@ elif [ "$1" = "update" ]; then
 
     cd "$root"
     git pull origin HEAD
-    git submodule foreach --recursive git pull origin master &
+    git submodule foreach --recursive git pull origin master
     git add -A && git commit -m 'update '
-    git push origin HEAD &
+    git push origin HEAD
     ssh l2 "/bin/bash /home/qiangzibro/myscripts/update_environments.sh" &# ssh执行远程脚本
     ssh l1 "/bin/bash /home/qiangzibro/myscripts/update_environments.sh" &# ssh执行远程脚本
     wait
